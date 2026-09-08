@@ -36,6 +36,22 @@ def create_task(args, body):
 
     return ['201 Created', 'task created']
 
+# Función encargada de actualizar los campos de una tarea con la información brindada en el cuerpo de la petición.
+def update_task(args, body):
+    # Recuperamos el ID de la tarea especificada.
+    task_id = int(args[1])
+
+    # Si la tarea no existe en el listado, respondemos con error 404.
+    if task_id not in tasks.keys():
+        return ['404 Not Found', 'task not found']
+
+    # Si la tarea existe, modificamos cada uno de sus campos con la información brindada en el cuerpo de la petición.
+    for field, value in body.items():
+        if field in tasks[task_id].keys():
+            tasks[task_id][field] = value
+
+    return ['200 OK', 'task updated']
+
 # Listado de controladores para cada verbo.
 routes = {
     'GET': {
@@ -47,6 +63,11 @@ routes = {
         'controller': create_task,
         'min_args': 0,
         'max_args': 0,
+    },
+    'PATCH': {
+        'controller': update_task,
+        'min_args': 1,
+        'max_args': 1,
     },
 }
 
