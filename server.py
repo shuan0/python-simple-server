@@ -52,6 +52,17 @@ def update_task(args, body):
 
     return ['200 OK', 'task updated']
 
+# Función encargada de eliminar una tarea del listado.
+def remove_task(args):
+    # Intentamos eliminar del listado a la tarea con el ID especificado.
+    removed_task = tasks.pop(args[1], None)
+
+    # Si la tarea no existe en el listado, respondemos con error 404.
+    if removed_task is None:
+        return ['404 Not Found', 'task not found']
+
+    return ['200 OK', 'task removed']
+
 # Listado de controladores para cada verbo.
 routes = {
     'GET': {
@@ -66,6 +77,11 @@ routes = {
     },
     'PATCH': {
         'controller': update_task,
+        'min_args': 1,
+        'max_args': 1,
+    },
+    'DELETE': {
+        'controller': remove_task,
         'min_args': 1,
         'max_args': 1,
     },
