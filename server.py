@@ -4,6 +4,9 @@ from wsgiref import simple_server
 # Listado de tareas que será mostrado y modificado con las peticiones.
 tasks = {}
 
+# Contador histórico de tareas creadas. Servirá principalmente para asignar un identificador único a cada tarea y así facilitar su búsqueda en el listado.
+task_counter = 0
+
 # Función encargada de obtener la información de una tarea. En caso de no especificar una, devuelve la información del listado completo.
 def get_tasks(args):
     # Si no se especificó el ID de una tarea, devolvemos el listado completo de tareas.
@@ -20,12 +23,30 @@ def get_tasks(args):
     # Devolvemos la tarea especificada en caso de existir.
     return ['200 OK', task]
 
+# Función encargada de crear una tarea con la información brindada en el cuerpo de la petición.
+def create_task(args, body):
+    global task_counter
+
+    # Incrementamos el contador de tareas creadas y luego lo utilizamos para asignarle un identificador a la nueva tarea.
+    task_counter += 1
+    tasks[task_counter] = {
+        'title': body['title'],
+        'done': body['done'],
+    }
+
+    return ['201 Created', 'task created']
+
 # Listado de controladores para cada verbo.
 routes = {
     'GET': {
         'controller': get_tasks,
         'min_args': 0,
         'max_args': 1,
+    },
+    'POST': {
+        'controller': create_task,
+        'min_args': 0,
+        'max_args': 0,
     },
 }
 
