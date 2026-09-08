@@ -70,7 +70,15 @@ def main_app(environ, start_response):
         start_response('404 Not Found', [('Content-Type', 'application/json')])
         return [b'route not found']
 
-    query_result = query_info['controller'](path_args)
+    controller = query_info['controller']
+
+    # En caso de que el verbo sea POST o PATCH, recuperamos la información contenida por el cuerpo de la petición para pasársela al controlador.
+    if method in ['POST', 'PATCH']:
+        body = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
+        body_data = json.loads(body.decode('utf-8'))
+        query_result = controller(path_args, body_data)
+    else:
+        query_result = controller(path_args)
 
     # Luego de que el controlador haya procesado la petición, respondemos al cliente con el resultado final.
     start_response(query_result[0], [('Content-Type', 'application/json')])
