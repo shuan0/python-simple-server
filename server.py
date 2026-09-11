@@ -11,10 +11,10 @@ task_counter = 0
 def get_tasks(args):
     # Si no se especificó el ID de una tarea, devolvemos el listado completo de tareas.
     if len(args) < 2:
-        return ['200 OK', tasks.values()]
+        return ['200 OK', list(tasks.values())]
 
     # En caso de que se haya especificado el ID de una tarea, ésta se busca en el listado.
-    task = tasks.get(args[1])
+    task = tasks.get(int(args[1]))
 
     # Si la tarea no existe, respondemos con error 404.
     if task is None:
@@ -29,12 +29,15 @@ def create_task(args, body):
 
     # Incrementamos el contador de tareas creadas y luego lo utilizamos para asignarle un identificador a la nueva tarea.
     task_counter += 1
-    tasks[task_counter] = {
+
+    new_task = {
+        'id': task_counter,
         'title': body['title'],
         'done': body['done'],
     }
+    tasks[task_counter] = new_task
 
-    return ['201 Created', 'task created']
+    return ['201 Created', new_task]
 
 # Función encargada de actualizar los campos de una tarea con la información brindada en el cuerpo de la petición.
 def update_task(args, body):
@@ -50,12 +53,12 @@ def update_task(args, body):
         if field in tasks[task_id].keys():
             tasks[task_id][field] = value
 
-    return ['200 OK', 'task updated']
+    return ['200 OK', tasks[task_id]]
 
 # Función encargada de eliminar una tarea del listado.
 def remove_task(args):
     # Intentamos eliminar del listado a la tarea con el ID especificado.
-    removed_task = tasks.pop(args[1], None)
+    removed_task = tasks.pop(int(args[1]), None)
 
     # Si la tarea no existe en el listado, respondemos con error 404.
     if removed_task is None:
